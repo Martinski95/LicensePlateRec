@@ -1,18 +1,18 @@
-#ifndef PLATE_HPP
-#define PLATE_HPP
+#ifndef LICENSE_PLATE_HPP
+#define LICENSE_PLATE_HPP
 
 #include <cv.h>
 
-#include <string>
+#include <cstring>
 #include <vector>
 
 using namespace std;
 using namespace cv;
 
-class Plate {
+class LicensePlate {
 	public:
-		Plate();
-		Plate(Mat img, Rect pos);
+		LicensePlate();
+		LicensePlate(Mat img, Rect pos);
 
 		string str();
 

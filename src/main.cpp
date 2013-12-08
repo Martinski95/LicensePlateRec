@@ -2,6 +2,8 @@
 #include <cv.h>
 #include <highgui.h>
 
+#include "SegmentImage.hpp"
+
 using namespace std;
 using namespace cv;
 
@@ -20,6 +22,10 @@ int main(int argc, char* argv[]) {
 	namedWindow("LicensePlateRec", CV_WINDOW_AUTOSIZE);
 
 	imshow("LicensePlateRec", image);
+
+	SegmentImage test;
+	test.setFilename(file);
+	vector<LicensePlate> testRegions = test.run(image);
 
 	waitKey(0);
 
