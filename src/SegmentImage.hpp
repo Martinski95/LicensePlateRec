@@ -22,6 +22,7 @@ class SegmentImage {
 		vector<LicensePlate> run(Mat inputImage);
 		const string& getFilename() const;
 		void setFilename(const string& filename);
+		bool checkSize(RotatedRect chunk);
 
 	private:
 		vector<LicensePlate> segment(Mat inputImage);
