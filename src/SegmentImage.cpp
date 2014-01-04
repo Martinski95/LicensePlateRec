@@ -13,8 +13,8 @@ void SegmentImage::setFilename(const string& filename) {
 }
 
 bool SegmentImage::checkSize(RotatedRect chunk){
-    float plateHeight = 11;
-    float plateWidth = 52;
+	// width = 52
+	// height = 11
     float aspectRatio = 4.727272;
     float errorRate = 0.4;
     int minArea = 15*15 * aspectRatio;
@@ -81,7 +81,7 @@ vector<LicensePlate> SegmentImage::segment(Mat inputImage) {
 	cv::Mat resultImage;
 	inputImage.copyTo(resultImage);
 
-	for(int i = 0; i < rects.size(); i++) {
+	for(uint i = 0; i < rects.size(); i++) {
 		float minSize;
 		Mat mask;
 
@@ -124,10 +124,38 @@ vector<LicensePlate> SegmentImage::segment(Mat inputImage) {
 		}
 		RotatedRect minRect = minAreaRect(interestPoints);
 
+		if(checkSize(minRect)){
+			Mat imageRotated;
+			Mat imageCropped;
+			Mat imagePlate;
+
+			float ratio = (float)minRect.size.width / (float)minRect.size.height;
+			float angle = minRect.angle;
+
+			if(ratio < 1) {
+				angle = 90 + angle;
+			}
+			Mat rotationMatrix = getRotationMatrix2D(minRect.center, angle, 1);
+
+			warpAffine(inputImage, imageRotated, rotationMatrix, inputImage.size(), CV_INTER_CUBIC);
+
+			Size rectSize = minRect.size;
+			if(ratio < 1) {
+				swap(rectSize.width, rectSize.height);
+			}
+
+			getRectSubPix(imageRotated, rectSize, minRect.center, imageCropped);
+
+			imagePlate.create(33,144, CV_8UC3);
+			resize(imageCropped, imagePlate, imagePlate.size(), 0, 0, INTER_CUBIC);
+			cvtColor(imagePlate, imagePlate, CV_BGR2GRAY);
+			blur(imagePlate, imagePlate, Size(3,3));
+			equalizeHist(imagePlate, imagePlate);
+			outputImages.push_back(LicensePlate(imagePlate, minRect.boundingRect()));
+		}
 	}
 
 	return outputImages;
-
 }
 
 vector<LicensePlate> SegmentImage::run(Mat inputImage) {
