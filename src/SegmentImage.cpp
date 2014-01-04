@@ -15,8 +15,8 @@ void SegmentImage::setFilename(const string& filename) {
 bool SegmentImage::checkSize(RotatedRect chunk){
     float plateHeight = 11;
     float plateWidth = 52;
-    float aspectRatio = plateWidth / plateHeight;
-    float errorRate = 0.3;
+    float aspectRatio = 4.727272;
+    float errorRate = 0.4;
     int minArea = 15*15 * aspectRatio;
     int maxArea = 125*125 * aspectRatio;
 
@@ -35,6 +35,7 @@ bool SegmentImage::checkSize(RotatedRect chunk){
     }
 
 }
+
 
 vector<LicensePlate> SegmentImage::segment(Mat inputImage) {
 	vector<LicensePlate> outputImages;
@@ -57,28 +58,40 @@ vector<LicensePlate> SegmentImage::segment(Mat inputImage) {
 	morphologyEx(imageThreshold, imageThreshold, CV_MOP_CLOSE, element);
 	imshow("Close image.", imageThreshold);
 
+	waitKey();
+
 	findContours(imageThreshold, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 
 	cout << contours.size() << endl;
 
 	vector<RotatedRect> rects;
-	for(vector<vector<Point> >::iterator it = contours.begin(); it != contours.end(); ++it) {
-		RotatedRect rect = minAreaRect(Mat(*it));
-		if(!checkSize(rect)) {
-			it = contours.erase(it);
-		} else {
-			++it;
-			rects.push_back(rect);
-		}
+	vector<vector<Point> >::iterator it = contours.begin();
+	while (it != contours.end()) {
+	        //Create bounding rect of object
+	        RotatedRect rect = minAreaRect(Mat(*it));
+	        if( !checkSize(rect)){
+	            it= contours.erase(it);
+	        }else{
+	            ++it;
+	            rects.push_back(rect);
+	        }
 	}
+
 
 	cv::Mat resultImage;
 	inputImage.copyTo(resultImage);
 
 	for(int i = 0; i < rects.size(); i++) {
-		circle(resultImage, rects[i].center, 3, Scalar(0,255,0), -1);
-
 		float minSize;
+		Mat mask;
+
+		int connectivity = 4;
+		int newMaskVal = 255;
+		int NumSeeds = 10;
+		Rect rect;
+
+		srand(time(0));
+
 		if(rects[i].size.width < rects[i].size.height) {
 			minSize = rects[i].size.width;
 		} else {
@@ -86,30 +99,35 @@ vector<LicensePlate> SegmentImage::segment(Mat inputImage) {
 		}
 
 		minSize = minSize - minSize*0.5;
-		//initialize rand and get 5 points around center for floodfill algorithm
-		srand(time(0));
-		//Initialize floodfill parameters and variables
-		Mat mask;
+
 		mask.create(inputImage.rows + 2, inputImage.cols + 2, CV_8UC1);
-		mask= Scalar::all(0);
-		int loDiff = 30;
-		int upDiff = 30;
-		int connectivity = 4;
-		int newMaskVal = 255;
-		int NumSeeds = 10;
-		Rect ccomp;
+		mask = Scalar::all(0);
+
 		int flags = connectivity + (newMaskVal << 8) + CV_FLOODFILL_FIXED_RANGE + CV_FLOODFILL_MASK_ONLY;
 		for(int j = 0; j < NumSeeds; j++){
 			Point seed;
+
 			seed.x = rects[i].center.x + rand() % (int)minSize - (minSize/2);
 			seed.y = rects[i].center.y + rand() % (int)minSize - (minSize/2);
-			circle(resultImage, seed, 1, Scalar(0,255,255), -1);
-			int area = floodFill(inputImage, mask, seed, Scalar(255,0,0), &ccomp, Scalar(loDiff, loDiff, loDiff), Scalar(upDiff, upDiff, upDiff), flags);
+
+			floodFill(inputImage, mask, seed, Scalar(255,0,0), &rect, Scalar(30, 30, 30), Scalar(30, 30, 30), flags);
 		}
+
 		imshow("MASK", mask);
+
+		vector<Point> interestPoints;
+
+		for(Mat_<uchar>::iterator itMask = mask.begin<uchar>() ; itMask != mask.end<uchar>(); ++itMask) {
+			if(*itMask == 255) {
+				interestPoints.push_back(itMask.pos());
+			}
+		}
+		RotatedRect minRect = minAreaRect(interestPoints);
+
 	}
 
 	return outputImages;
+
 }
 
 vector<LicensePlate> SegmentImage::run(Mat inputImage) {
