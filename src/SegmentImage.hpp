@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <cstring>
+#include <string>
 
 using namespace std;
 using namespace cv;

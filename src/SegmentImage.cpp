@@ -151,6 +151,12 @@ vector<LicensePlate> SegmentImage::segment(Mat inputImage) {
 			cvtColor(imagePlate, imagePlate, CV_BGR2GRAY);
 			blur(imagePlate, imagePlate, Size(3,3));
 			equalizeHist(imagePlate, imagePlate);
+			imshow("ImagePlate", imagePlate);
+			stringstream ss(stringstream::in | stringstream::out);
+			ss << "grayResults/" << filename << "_" << i << ".jpg";
+			imwrite(ss.str(), imagePlate);
+			cout << "write" << endl;
+			waitKey();
 			outputImages.push_back(LicensePlate(imagePlate, minRect.boundingRect()));
 		}
 	}
