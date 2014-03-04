@@ -1,5 +1,5 @@
-#ifndef SEGMENTIMAGE_HPP_
-#define SEGMENTIMAGE_HPP_
+#ifndef SEGMENT_IMAGE_HPP
+#define SEGMENT_IMAGE_HPP
 
 #include <cv.h>
 #include <highgui.h>
@@ -16,18 +16,18 @@ using namespace cv;
 
 class SegmentImage {
 	public:
-		SegmentImage();
-
-		string filename;
+		SegmentImage(string file);
 
 		vector<LicensePlate> run(Mat inputImage);
 		const string& getFilename() const;
 		void setFilename(const string& filename);
-		bool checkSize(RotatedRect chunk);
+		bool checkSize(RotatedRect rect);
 
 	private:
+		string filename;
 		vector<LicensePlate> segment(Mat inputImage);
-
+		Mat croppingMask(RotatedRect rect, Mat inputImage);
+		Mat processRect(Mat inputImage, RotatedRect minRect);
 };
 
 #endif

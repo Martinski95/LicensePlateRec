@@ -2,8 +2,6 @@
 #define LICENSE_PLATE_HPP
 
 #include <cv.h>
-
-#include <cstring>
 #include <vector>
 
 using namespace std;
@@ -14,7 +12,7 @@ class LicensePlate {
 		LicensePlate();
 		LicensePlate(Mat img, Rect pos);
 
-		string str();
+		string orderChars();
 
 		Rect platePos;
 		Mat plateImg;

@@ -2,13 +2,13 @@
 #define OCR_HPP
 
 #include "LicensePlate.hpp"
+#include "CharSegment.hpp"
 
 #include <cv.h>
 #include <highgui.h>
 #include <cvaux.h>
 #include <ml.h>
 
-#include <string.h>
 #include <vector>
 
 using namespace std;
@@ -23,11 +23,22 @@ class OCR {
 		OCR(string trainingFile);
 
 		static const int numChars;
-		static const int strChars[];
+        static const char chars[];
 		int charSize;
 
-		string run(LicensePlate* input);
-		Mat preprocessChar(Mat in);
+		bool run(LicensePlate* input);
+		Mat preprocessChar(Mat input);
+		Mat features(Mat input, int size);
+		bool train(Mat trainingData, Mat classes, int numLayers);
+		int classify(Mat input);
+		bool trained();
+
+	private:
+		bool isTrained;
+		CvANN_MLP  ann;
+		Mat calcHistogram(Mat img, int t);
+		vector<CharSegment> segment(LicensePlate input);
+		bool checkSize(Mat rect);
 
 };
 

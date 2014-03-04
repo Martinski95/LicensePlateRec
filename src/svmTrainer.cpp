@@ -8,7 +8,7 @@
 using namespace std;
 using namespace cv;
 
-int main(int argc, char* argv[]) {
+int main(unsigned int argc, char* argv[]) {
 	char* pathPlates;
 	char* pathNotPlates;
 	int numPlates = 71;
@@ -19,12 +19,9 @@ int main(int argc, char* argv[]) {
 	Mat trainingImages;
 	vector<int> trainingLabels;
 
-	if(argc >= 3) {
-		pathPlates = argv[1];
-		pathNotPlates = argv[2];
-	} else {
-		cout << "How to use: " << argv[0] << " path_to_plate_files path_to_not_plate_files" << endl;
-	}
+	pathPlates = argv[1];
+	pathNotPlates = argv[2];
+
 	cout << "SVM trainer for LicensePlateRec." << endl;
 
 	cout << "Enter number of plates..." << endl;
@@ -60,9 +57,9 @@ int main(int argc, char* argv[]) {
 	Mat(trainingLabels).copyTo(classes);
 
 	FileStorage fs("SVM.xml", FileStorage::WRITE);
-    fs << "TrainingData" << trainingData;
-    fs << "classes" << classes;
-    fs.release();
+	fs << "TrainingData" << trainingData;
+	fs << "classes" << classes;
+	fs.release();
 
 	return 0;
 }
