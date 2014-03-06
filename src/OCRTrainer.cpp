@@ -1,45 +1,22 @@
-#include <cv.h>
-#include <highgui.h>
-#include <cvaux.h>
+#include "OCRTrainer.hpp"
 
-#include "OCR.hpp"
+const int OCRTrainer::charsFiles[] = {99, 74, 97, 86, 95, 101, 95, 79, 93, 88, 132, 140, 96, 16, 56, 65, 55, 20, 47, 46, 86, 19};
 
-#include <iostream>
-#include <vector>
+OCRTrainer::OCRTrainer() {
 
-using namespace std;
-using namespace cv;
+}
 
-const int charsFiles[22] = {99, 74, 97, 86, 95, 101, 95, 79, 93, 88, 132, 140, 96, 16, 56, 65, 55, 20, 47, 46, 86, 19};
-
-int main() {
+void OCRTrainer::run() {
 	cout << "OCR trainer for LicensePlateRec." << endl;
-
-	string path;
 	cout << "Enter path to directory with chars folders..." << endl;
 	cin >> path;
 
-	Mat classes;
-	Mat trainingDataf5;
-	Mat trainingDataf10;
-	Mat trainingDataf15;
-	Mat trainingDataf20;
-	Mat trainingDataf25;
-
-	vector<int> trainingLabels;
-	OCR ocr;
-
 	for(int i = 0; i < OCR::numChars; i++) {
-		cout << "i = " << i << " numChars == " << OCR::numChars << endl;
-
 		int numFiles = charsFiles[i];
-		cout << "numFiles == " << numFiles << endl;
-		cin.get();
 		for(int j = 0; j < numFiles; j++) {
-			cout << "Char: " << OCR::chars[i] << " file: " << j << endl;
 			stringstream ss;
 			ss << path << "/" << OCR::chars[i] << "_" << j << ".jpg";
-			cout << "path: " << ss.str() << endl;
+
 			Mat image = imread(ss.str(), 0);
 
 			Mat f5 = ocr.features(image, 5);
@@ -63,9 +40,10 @@ int main() {
 	trainingDataf15.convertTo(trainingDataf15, CV_32FC1);
 	trainingDataf20.convertTo(trainingDataf20, CV_32FC1);
 	trainingDataf25.convertTo(trainingDataf25, CV_32FC1);
+
 	Mat(trainingLabels).copyTo(classes);
 
-	FileStorage fs("OCRData.xml", FileStorage::WRITE);
+	FileStorage fs("OCRData___debug.xml", FileStorage::WRITE);
 	fs << "TrainingDataF5" << trainingDataf5;
 	fs << "TrainingDataF10" << trainingDataf10;
 	fs << "TrainingDataF15" << trainingDataf15;
@@ -73,7 +51,12 @@ int main() {
 	fs << "TrainingDataF25" << trainingDataf25;
 	fs << "classes" << classes;
 	fs.release();
-
-	return 0;
 }
 
+const string& OCRTrainer::getPath() const {
+	return path;
+}
+
+void OCRTrainer::setPath(const string& path) {
+	this->path = path;
+}

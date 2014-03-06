@@ -211,11 +211,11 @@ bool OCR::run(LicensePlate* input) {
 	vector<CharSegment> segments = segment(*input);
 
 	for(unsigned int i = 0; i < segments.size(); i++) {
-		Mat c = preprocessChar(segments[i].img);
+		Mat c = preprocessChar(segments[i].getImg());
 		Mat f = features(c, 25);
 		int character = classify(f);
 		input->chars.push_back(chars[character]);
-		input->charsPositions.push_back(segments[i].pos);
+		input->charsPositions.push_back(segments[i].getPos());
 	}
 
 	return true;

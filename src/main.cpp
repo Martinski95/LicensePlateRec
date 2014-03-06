@@ -23,14 +23,10 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
-	//namedWindow("LicensePlateRec", CV_WINDOW_AUTOSIZE);
-
-	//imshow("LicensePlateRec", image);
-
 	SegmentImage segmentedImage(file);
 	vector<LicensePlate> regions = segmentedImage.run(image);
 
-	SVMClassifier svm("/home/marto/workspace/LicensePlateRec/Debug/SVM.xml");
+	SVMClassifier svm("SVM.xml");
 	vector<LicensePlate> plates;
 	for(unsigned int i=0; i< regions.size(); i++)
 	{
@@ -38,8 +34,7 @@ int main(int argc, char* argv[]) {
 		Mat p = img.reshape(1, 1);
 		p.convertTo(p, CV_32FC1);
 
-		bool response = svm.predict(p);
-		if(response) {
+		if(svm.predict(p)) {
 			plates.push_back(regions[i]);
 		}
 	}
