@@ -1,24 +1,33 @@
-#include "SVMTrainer.hpp"
+#include <cv.h>
+#include <highgui.h>
+#include <cvaux.h>
 
-SVMTrainer::SVMTrainer() {
-	numNotPlates = 0;
-	numPlates = 0;
-}
+#include <iostream>
+#include <vector>
 
-void SVMTrainer::setPaths() {
+using namespace std;
+using namespace cv;
+
+int main(unsigned int argc, char* argv[]) {
+	char* pathPlates;
+	char* pathNotPlates;
+	int numPlates = 71;
+	int numNotPlates = 74;
+
+	Mat classes;
+	Mat trainingData;
+	Mat trainingImages;
+	vector<int> trainingLabels;
+
+	pathPlates = argv[1];
+	pathNotPlates = argv[2];
+
 	cout << "SVM trainer for LicensePlateRec." << endl;
+
 	cout << "Enter number of plates..." << endl;
 	cin >> numPlates;
 	cout << "Enter number of not plates..." << endl;
 	cin >> numNotPlates;
-	cout << "Enter path to plates..." << endl;
-	cin >> pathPlates;
-	cout << "Enter path to not plates..." << endl;
-	cin >> pathNotPlates;
-}
-
-void SVMTrainer::run() {
-	setPaths();
 
 	for(int i = 0; i < numPlates; i++) {
 		stringstream ss;
@@ -52,36 +61,5 @@ void SVMTrainer::run() {
 	fs << "classes" << classes;
 	fs.release();
 
-}
-
-int SVMTrainer::getNumNotPlates() const {
-	return numNotPlates;
-}
-
-void SVMTrainer::setNumNotPlates(int numNotPlates) {
-	this->numNotPlates = numNotPlates;
-}
-
-int SVMTrainer::getNumPlates() const {
-	return numPlates;
-}
-
-void SVMTrainer::setNumPlates(int numPlates) {
-	this->numPlates = numPlates;
-}
-
-const string& SVMTrainer::getPathNotPlates() const {
-	return pathNotPlates;
-}
-
-void SVMTrainer::setPathNotPlates(const string& pathNotPlates) {
-	this->pathNotPlates = pathNotPlates;
-}
-
-const string& SVMTrainer::getPathPlates() const {
-	return pathPlates;
-}
-
-void SVMTrainer::setPathPlates(const string& pathPlates) {
-	this->pathPlates = pathPlates;
+	return 0;
 }
